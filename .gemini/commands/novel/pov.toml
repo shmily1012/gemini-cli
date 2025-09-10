@@ -1,0 +1,17 @@
+description = "POV 统计与平衡建议：写入 novel/review/pov.md"
+prompt = """
+请对章节文本中的 POV（叙事视角/主视角角色）进行统计与分析，并提出平衡建议。
+
+读取：
+- novel/chapters/*.md（通过 glob）
+- novel/outline.md、novel/bible/characters.md（辅助识别角色与 POV 目标）
+
+任务：
+1) 逐章识别 POV 归属（若无法确定，标注“未知/混合”并给出理由）。
+2) 统计 POV 分布（总量、占比、连续段落长度），给出简单的 ASCII 柱状图/表格。
+3) 检测“过度偏科/视角跳跃/信息不对称”等问题，并给出章节级调整建议（合并/切换/插入场景）。
+
+输出：
+- 写入 novel/review/pov.md（若目录不存在请先创建）。
+"""
+
