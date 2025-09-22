@@ -7,6 +7,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as vscode from 'vscode';
 import { activate } from './extension.js';
+import { IDE_DEFINITIONS, detectIdeFromEnv } from '@google/gemini-cli-core';
+
+vi.mock('@google/gemini-cli-core', async () => {
+  const actual = await vi.importActual('@google/gemini-cli-core');
+  return {
+    ...actual,
+    detectIdeFromEnv: vi.fn(() => IDE_DEFINITIONS.vscode),
+  };
+});
 
 vi.mock('vscode', () => ({
   window: {
@@ -178,6 +187,23 @@ describe('activate', () => {
         }),
       } as Response);
 
+      const showInformationMessageMock = vi.mocked(
+        vscode.window.showInformationMessage,
+      );
+
+      await activate(context);
+
+      expect(showInformationMessageMock).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      {
+        ide: IDE_DEFINITIONS.cloudshell,
+      },
+      { ide: IDE_DEFINITIONS.firebasestudio },
+    ])('does not show the notification for $ide.name', async ({ ide }) => {
+      vi.mocked(detectIdeFromEnv).mockReturnValue(ide);
+      vi.mocked(context.globalState.get).mockReturnValue(undefined);
       const showInformationMessageMock = vi.mocked(
         vscode.window.showInformationMessage,
       );
